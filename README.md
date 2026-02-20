@@ -1,4 +1,5 @@
 # multimodal-RAG
+
 ## dots.ocr-1.5 vllm部署
 ### 问题
 + 模型下载后的目录名称中不能含有"."，因为目录名需要作为python包名，注入vllm
@@ -36,4 +37,36 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --chat-template-content-format string \
 --served-model-name dots_orc_1_5 \
 --trust-remote-code
+```
+
+## neo4j部署
+版本选择：5.26.8
+下载地址：<a href="https://neo4j.ac.cn/deployment-center">neo4j下载地址</a>
+### 安装
+```shell
+sudo apt install cypher-shell_5.26.8_all.deb
+sudo apt install neo4j_5.26.8_all.deb
+```
+### 编辑neo4j配置
+监听所有ip请求，默认localhost
+```shell
+ server.default_listen_address=0.0.0.0
+```
+### 启动服务
+启动服务后，访问web ui:  
+http://localhost:7474
+```shell
+# 设置初始密码，最开始密码默认是neo4j
+neo4j-admin dbms set-initial-password neo4j123
+# 启动服务
+systemctl start neo4j
+```
+### 安装apoc
+apoc是neo4j的扩展库，为neo4j提供了大量的官方Cypher语法本身不具备的，增强型的过程和函数。在多模态RAG的应用中，能够提供更丰富的schema，让大模型写出更好的cypher sql查询neo4j。
+apoc版本需要与neo4j对应，下载地址：<a href="https://github.com/neo4j/apoc/releases/download/5.26.8/apoc-5.26.8-core.jar">apoc下载地址</a>
+```shell
+# 将下载后的jar包放入到
+mv apoc-5.26.8-core.jar /var/lib/neo4j/plugins
+# 重启neo4j
+systemctl restart neo4j
 ```
