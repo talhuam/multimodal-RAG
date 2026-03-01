@@ -70,3 +70,55 @@ mv apoc-5.26.8-core.jar /var/lib/neo4j/plugins
 # 重启neo4j
 systemctl restart neo4j
 ```
+
+## milvus部署
+milvus部署方式有多种：
++ milvus lite是一个python库，只需要指定数据库保存目录即可，适用于几百万个向量的数据规模，**该方式不支持windows环境**
+```shell
+pip install -U pymilvus 
+```
++ standalone，可以通过docker compose部署，也能通过deb或者rpm包部署成系统服务，适用于亿级个向量的数据规模。**本项目采用该方式部署**
++ distributed，需要部署在k8s，适用于亿级到数百亿级个向量的数据规模
+> 1. standalone和distributed部署方式可参见<a href="https://milvus.io/docs/zh">milvus官网</a>  
+> 2. 图形化界面可采用<a href="https://github.com/zilliztech/attu">Attu</a>
+### milvus docker方式安装
++ 下载docker compose配置文件 和 milvus配置文件
+```shell
+wget https://github.com/milvus-io/milvus/releases/tag/v2.6.11/milvus-standalone-docker-compose.yml -O docker-compose.yml
+# 配置文件
+cd /etc
+wget https://raw.githubusercontent.com/milvus-io/milvus/v2.6.11/configs/milvus.yaml
+```
++ 编辑配置文件，启用安全认证
+<img src="img/milvus_security_config.png">
++ 修改docker-compose配置，应用配置文件  
+```shell
+# 增加一行配置
+/etc/milvus.yaml:/milvus/configs/milvus.yaml
+```
+<img src="img/milvus_docker_compose.png">
++ docker compose启动
+```shell
+# 启动
+docker-compose up -d
+# 其他命令
+docker-compose down # 停止
+```
+
+### 图像化界面Attu安装
+```shell
+# 替换milvus ip为具体的milvus向量数据库的host
+docker run -d -p 8000:3000 -e MILVUS_URL=<milvus ip>:19530 zilliz/attu:v2.6
+```
+打开web ui:
+http://localhost:8000
+<img src="img/Attu.png">
+### milvus相关
+#### 支持的字段
++ 主键：可指定int或者varchar，如果指定auto_id，int型则自增，varchar型则随机生成一个字符串
++ 密集向量：用于语义匹配
++ 稀疏向量：用于全文检索，需要指定**分词器**，中文用jieba，英文则指定standard
++ 标量：用于过滤和范围检索
+
+#### milvus创建collection模版
+参见：create_milvus_collection.py
