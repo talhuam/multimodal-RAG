@@ -89,14 +89,17 @@ wget https://github.com/milvus-io/milvus/releases/tag/v2.6.11/milvus-standalone-
 cd /etc
 wget https://raw.githubusercontent.com/milvus-io/milvus/v2.6.11/configs/milvus.yaml
 ```
+
 + 编辑配置文件，启用安全认证
 <img src="img/milvus_security_config.png">
+
 + 修改docker-compose配置，应用配置文件  
 ```shell
 # 增加一行配置
 /etc/milvus.yaml:/milvus/configs/milvus.yaml
 ```
 <img src="img/milvus_docker_compose.png">
+
 + docker compose启动
 ```shell
 # 启动
