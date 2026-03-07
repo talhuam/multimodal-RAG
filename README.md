@@ -1,5 +1,13 @@
 # multimodal-RAG
 
+## 整体架构
+
+## 使用
++ ocr解析
+
++ chunk切分
+
+---
 ## dots.ocr-1.5 vllm部署
 ### 问题
 + 模型下载后的目录名称中不能含有"."，因为目录名需要作为python包名，注入vllm
@@ -36,6 +44,20 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --gpu-memory-utilization 0.9 \
 --chat-template-content-format string \
 --served-model-name dots_orc_1_5 \
+--trust-remote-code
+```
+
+## Qwen3 Embedding模型部署
+项目使用的是：Qwen3-Embedding-0.6B，主要用于**语义分割**。语义分割原理：计算两两句子的相似性，如果相似性低于某个阈值，则切割
+### 要求
++ vllm==0.8.5
++ transformers==4.51.1
+### vllm服务
+```shell
+CUDA_VISIBLE_DEVICES=0 vllm serve \
+/mnt/e/llm/models/qwen/Qwen3-Embedding-0.6B \
+--served_model_name Qwen3-Embedding \
+--task embed \
 --trust-remote-code
 ```
 

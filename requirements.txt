@@ -5,3 +5,6 @@ openai
 pillow
 PyMuPDF
 pymilvus
+langchain-text-splitters
+langchain-openai
+langchain-experimental
