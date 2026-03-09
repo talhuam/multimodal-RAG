@@ -11,11 +11,11 @@ from langchain_experimental.text_splitter import SemanticChunker
 from langchain_openai import OpenAIEmbeddings
 from langchain_core.documents import Document
 
-from utils.os_utils import get_sorted_md_files
-
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
+
+from utils.os_utils import get_sorted_md_files
 
 
 class MarkdownDirSplitter:
@@ -197,5 +197,9 @@ class MarkdownDirSplitter:
 
 if __name__ == '__main__':
     splitter = MarkdownDirSplitter(images_output_dir="../data/images")
-    result = splitter.process_md_dir(md_dir="../data/Attention Is All You Need", source_filename="Attention Is All You Need.pdf")
+    result = splitter.process_md_dir(md_dir="../data/Flink", source_filename="Flink.pdf")
     print(result)
+
+    # chunk(langchain Document) 写入 milvus
+    from milvus.milvus_operator import do_save_to_milvus
+    do_save_to_milvus(result)

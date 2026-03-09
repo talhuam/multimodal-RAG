@@ -1,5 +1,12 @@
 # multimodal-RAG
 
+## 环境说明
++ 多模态对话模型：Qwen3-VL-4B-Instruct
++ 多模态表征模型：Qwen3-VL-Embedding-2B
++ 语义切割文本表征模型：Qwen3-Embedding-0.6B
++ OCR模型：dots.ocr-1.5
++ 向量存储：milvus v2.6.11
+
 ## 整体架构
 
 ## 使用
@@ -45,6 +52,65 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --chat-template-content-format string \
 --served-model-name dots_orc_1_5 \
 --trust-remote-code
+```
+
+## Qwen3-vl-4B-Instruct部署
+### 要求
++ vllm==0.14
++ transformers==4.57.0
++ pytorch==2.8.0
++ ### vllm服务
+```shell
+CUDA_VISIBLE_DEVICES=0 vllm serve \
+/mnt/e/llm/models/qwen/Qwen3-VL-4B-Instruct \
+--tensor-parallel-size 1 \
+--gpu-memory-utilization 0.9 \
+--served-model-name Qwen3vl \
+--trust-remote-code \
+--max-model-len 20480
+```
+### 请求示例
+```shell
+curl http://localhost:8000/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "Qwen3vl",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "这张图片里有什么？"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg"
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 300
+  }'
+```
+
+## Qwen3-VL-Embedding-2B部署
+### 要求
++ vllm==0.14: 版本来源：https://github.com/QwenLM/Qwen3-VL-Embedding/blob/main/examples/embedding_vllm.ipynb
++ transformers>=4.57.0
++ pytorch==2.8.0
+### vllm服务
+```shell
+# embedding、classification、reward model都是pooling模型
+# runner参数可选：auto, draft, generate, pooling
+CUDA_VISIBLE_DEVICES=0 vllm serve \
+/mnt/e/llm/models/qwen/Qwen3-VL-Embedding-2B \
+--served_model_name Qwen3vl-Embedding \
+--runner pooling \
+--trust-remote-code \
+--max-model-len 65536
 ```
 
 ## Qwen3 Embedding模型部署
@@ -133,10 +199,11 @@ docker-compose down # 停止
 ### 图像化界面Attu安装
 ```shell
 # 替换milvus ip为具体的milvus向量数据库的host
-docker run -d -p 8000:3000 -e MILVUS_URL=<milvus ip>:19530 zilliz/attu:v2.6
+# 由于和vllm默认端口冲突，所以代理端口改为8001
+docker run -d -p 8001:3000 -e MILVUS_URL=<milvus ip>:19530 zilliz/attu:v2.6
 ```
 打开web ui:
-http://localhost:8000
+http://localhost:8001
 <img src="img/Attu.png">
 ### milvus相关
 #### 支持的字段
@@ -146,4 +213,4 @@ http://localhost:8000
 + 标量：用于过滤和范围检索
 
 #### milvus创建collection模版
-参见：create_milvus_collection.py
+参见：milvus/create_milvus_collection_template.py

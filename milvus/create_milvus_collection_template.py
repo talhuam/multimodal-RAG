@@ -1,3 +1,7 @@
+"""
+milvus建表模版
+"""
+
 from pymilvus import MilvusClient, DataType, Function, FunctionType
 
 client = MilvusClient(

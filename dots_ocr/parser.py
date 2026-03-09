@@ -234,13 +234,13 @@ class DotsOCRParser:
                 # 如果不是仅检测模式，生成Markdown内容
                 if prompt_mode != "prompt_layout_only_en":
                     # 如果cell的类型是图片的话，会进行裁剪，然后转化成base64字符串
-                    md_content = layoutjson2md(origin_image, cells, text_key='text')
-                    md_content_no_hf = layoutjson2md(origin_image, cells, text_key='text', no_page_hf=True)
+                    md_content = layoutjson2md(origin_image, cells, text_key='text')  # 保留页眉页脚
+                    md_content_no_hf = layoutjson2md(origin_image, cells, text_key='text', no_page_hf=True)  # 去除页眉页脚
 
                     # 保存完整Markdown
                     md_file_path = os.path.join(save_dir, f"{save_name}.md")
                     with open(md_file_path, "w", encoding="utf-8") as md_file:
-                        md_file.write(md_content)
+                        md_file.write(md_content_no_hf)
 
                     result.update({
                         'md_content_path': md_file_path,
