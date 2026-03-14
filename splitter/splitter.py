@@ -14,8 +14,8 @@ from langchain_core.documents import Document
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-
 from utils.os_utils import get_sorted_md_files
+from utils.embedding_utils import embeddings
 
 
 class MarkdownDirSplitter:
@@ -24,7 +24,7 @@ class MarkdownDirSplitter:
     抽取出markdown中的base64格式图片保存为本地图片，同时移除markdown中的base64字符串
     """
     def __init__(self, images_output_dir, text_chunk_size=1000):
-        self.images_output_dir = images_output_dir
+        self.images_output_dir = os.path.realpath(images_output_dir)  # 转为绝对路径
         self.text_chunk_size = text_chunk_size
         os.makedirs(images_output_dir, exist_ok=True)
 
@@ -37,11 +37,7 @@ class MarkdownDirSplitter:
         self.text_splitter = MarkdownHeaderTextSplitter(self.headers_to_split_on)
 
         # 语义相似性切割，原理：计算两两句子的相似性，如果相似性低于某个阈值，则拆分
-        self.embeddings = OpenAIEmbeddings(
-            model="Qwen3-Embedding",
-            base_url="http://localhost:8000/v1",
-            api_key="empty"
-        )
+        self.embeddings = embeddings
         self.semantic_splitter = SemanticChunker(
             embeddings=self.embeddings,
             breakpoint_threshold_type="percentile"

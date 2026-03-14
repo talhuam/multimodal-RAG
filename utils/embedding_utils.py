@@ -1,12 +1,24 @@
 """
-多模态表征，支持：
+多模态表征(embedding)，支持：
 1、文本表征
 2、图片表征
 3、文本+图片混合表征
 """
+import os
+import sys
 import requests
+from langchain_openai import OpenAIEmbeddings
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 from utils.log_utils import log
-from typing import Tuple
+
+
+# 主要用于语义切割 和 评估模块
+embeddings = OpenAIEmbeddings(
+    model="Qwen3-Embedding",
+    base_url="http://localhost:8000/v1",
+    api_key="empty"
+)
 
 
 class EmbeddingException(Exception):
@@ -32,7 +44,7 @@ def image_to_base64(img: str) -> str:
         return ""
 
 
-def embed(text: str = None, image: str = None, max_try_times: int = 3):
+def vl_embed(text: str = None, image: str = None, max_try_times: int = 3) -> list:
     content = []
     if text:
         content.append({

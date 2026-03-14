@@ -16,7 +16,7 @@ from milvus.create_milvus_collection import client, DOC_COLLECTION_NAME
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from utils.embedding_utils import image_to_base64
 from utils.model_utils import multimodal_llm
-from utils.embedding_utils import embed
+from utils.embedding_utils import vl_embed
 from utils.log_utils import log
 
 
@@ -216,7 +216,7 @@ def do_save_to_milvus(processed_data: List[Document]):
     for idx, item in enumerate(processed_data):
         raw_text = item.get("text")
         raw_image = item.get("image_path")
-        embedding = embed(text=raw_text, image=raw_image)
+        embedding = vl_embed(text=raw_text, image=raw_image)
         item["dense"] = embedding
         results.append(item)
 
@@ -225,3 +225,13 @@ def do_save_to_milvus(processed_data: List[Document]):
         print(json.dumps(item, ensure_ascii=False, indent=4))
 
     write_to_milvus(processed_data)
+
+
+def update_milvus_entity():
+    """
+    额外函数，用于将image_path的相对路径改成绝对路径，重新写入库中
+    """
+    for entity in client.query(collection_name=DOC_COLLECTION_NAME, limit=1000):
+        if entity.get("image_path"):
+            entity["image_path"] = os.path.realpath(entity["image_path"])
+            client.upsert(collection_name=DOC_COLLECTION_NAME, data=entity)

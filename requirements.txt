@@ -11,6 +11,7 @@ langchain-openai
 langchain-experimental
 langchain-core
 requests
+ragas==0.3.0
 
 # 日志
 loguru

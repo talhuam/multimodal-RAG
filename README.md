@@ -10,10 +10,11 @@
 ## 整体架构
 
 ## 使用
-+ ocr解析
++ OCR解析
 
-+ chunk切分
++ chunk切分与入库
 
++ chunk召回(any-to-any)
 ---
 ## dots.ocr-1.5 vllm部署
 ### 问题
@@ -67,7 +68,8 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --gpu-memory-utilization 0.9 \
 --served-model-name Qwen3vl \
 --trust-remote-code \
---max-model-len 20480
+--max-model-len 20480 \
+--port 8010
 ```
 ### 请求示例
 ```shell
@@ -110,7 +112,8 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --served_model_name Qwen3vl-Embedding \
 --runner pooling \
 --trust-remote-code \
---max-model-len 65536
+--max-model-len 65536 \
+--port 8020
 ```
 
 ## Qwen3 Embedding模型部署
@@ -124,7 +127,8 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 /mnt/e/llm/models/qwen/Qwen3-Embedding-0.6B \
 --served_model_name Qwen3-Embedding \
 --task embed \
---trust-remote-code
+--trust-remote-code \
+--port 8000
 ```
 
 ## neo4j部署
