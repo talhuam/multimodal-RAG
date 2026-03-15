@@ -9,16 +9,59 @@
 
 ## 整体架构
 ### 构建知识库
+<img src="img/build_knowledge.png">
 
 ### 多模态RAG
+<img src="img/multimodal_rag.png">
 
+1. process_input: 抽取用户输入的文本和图片，如果用户只输入的图片，则直接进行知识库检索(图像不能从长期记忆检索)
+2. first_chatbot: 基于短期记忆(messages)回答用户问题，如果短期记忆满足不了回答问题的要求，则调用工具检索长期记忆
+3. second_chatbot: 如果长期记忆中有记录，则抽取分数最高的一条进行回答
+4. retriever_node: 长期记忆中没有记录，则查询知识库召回chunk
+5. third_chatbot: 基于知识chunk进行回答，如果用户输入只有图片则跳过评估模块，如果用户输入含有文本则进入评估模块
+6. evaluate_node: 采用ragas评估问题和答案的相关性，相关性高直接回复，相关性低则进入human-in-the-loop
+7. human_approval: 用于拒绝答案(rejected)，则进入兜底回答
+8. fourth_chatbot: 兜底回复
 
-## 使用
-+ OCR解析
-
-+ chunk切分与入库
-
-+ chunk召回(any-to-any)
+## 目录结构
+```
+multimodal-RAG
+├── data                                        # 保存解析后的markdown
+├── dots_ocr
+│   ├── __init__.py
+│   ├── inference.py                            # 只提取文字，不提取图片
+│   └── parser.py                               # dots.orc解析，解析**流程入口**，交付解析后的markdown文件
+├── evaluate
+│   ├── __init__.py
+│   └── evaluate.py                             # ragas评估
+├── img
+├── milvus
+│   ├── __init__.py
+│   ├── create_milvus_collection.py             # 创建milvus表，含知识库表和上下文表
+│   ├── create_milvus_collection_template.py    # 创建milvus表模版脚本
+│   ├── milvus_operator.py                      # milvus入库流程，被splitter/splitter.py调用
+│   └── milvus_retriever.py                     # milvus检索，含语义检索、全文检索和混合检索
+├── splitter
+│   ├── __init__.py
+│   └── splitter.py                             # markdown转化为chunk的**流程入口**
+├── utils
+│   ├── __init__.py
+│   ├── embedding_utils.py                      # 文本embedding和多模态embedding
+│   ├── log_utils.py                            # 日志工具
+│   ├── model_utils.py                          # 多模态聊天模型
+│   └── os_utils.py                             # 系统级别工具，主要为获取排完序的文件列表
+└── workflow
+    ├── __init__.py
+    ├── context_saver.py                        # 上下文异步保存milvus
+    ├── evaluate_node.py                        # 评估节点
+    ├── multimodal_rag_workflow.py              # 多模态RAG工作流**主流程**
+    ├── print_messages.py                       # 打印message
+    ├── retrieve_node.py                        # 知识库召回节点
+    ├── router.py                               # 条件边路由函数
+    ├── search_node.py                          # 上下文搜索节点
+    ├── tools.py                                # 上下文搜索工具
+    └── workflow_state.py                       # 工作流状态定义
+```
 ---
 ## dots.ocr-1.5 vllm部署
 ### 问题

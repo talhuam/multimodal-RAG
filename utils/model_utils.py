@@ -1,4 +1,5 @@
 from langchain_openai import ChatOpenAI
+from embedding_utils import image_to_base64
 
 
 multimodal_llm = ChatOpenAI(
@@ -11,6 +12,16 @@ multimodal_llm = ChatOpenAI(
 # print(multimodal_llm.invoke([
 #     {
 #         "role": "user",
-#         "content": "你是谁"
+#         "content": [
+#             {
+#                 "type": "text",
+#                 "text": "请生成项目的目录结构"
+#             }, {
+#                 "type": "image_url",
+#                 "image_url": {
+#                     "url": image_to_base64("../img/img.png")
+#                 }
+#             }
+#         ]
 #     }
 # ]).content)
