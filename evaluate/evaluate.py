@@ -42,6 +42,9 @@ class RAGEvaluator:
         """
         上下文相关性评估: 检索到的上下文（块或段落）是否与用户输入相关
         """
+        # 0 → 检索到的上下文与用户查询完全不相关。
+        # 1 → 上下文部分相关。
+        # 2 → 上下文完全相关。
         contexts = [context['text'] for context in contexts]
         # SingleTurnSample用于表示单轮对话的评估样本
         sample = SingleTurnSample(user_input=question, retrieved_contexts=contexts)

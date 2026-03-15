@@ -1,4 +1,5 @@
 # 核心包
+langgraph==1.0.8
 langchain==1.2.10
 langchain-neo4j==0.8.0
 neo4j==6.1.0
@@ -15,3 +16,4 @@ ragas==0.3.0
 
 # 日志
 loguru
+

@@ -8,6 +8,10 @@
 + 向量存储：milvus v2.6.11
 
 ## 整体架构
+### 构建知识库
+
+### 多模态RAG
+
 
 ## 使用
 + OCR解析
@@ -60,7 +64,9 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 + vllm==0.14
 + transformers==4.57.0
 + pytorch==2.8.0
-+ ### vllm服务
+### vllm服务
++ enable-auto-tool-choice: 启用模型的自动工具选择能力，让模型能够自主决定何时调用工具
++ tool-call-parser: 指定工具调用的解析器为 hermes
 ```shell
 CUDA_VISIBLE_DEVICES=0 vllm serve \
 /mnt/e/llm/models/qwen/Qwen3-VL-4B-Instruct \
@@ -69,7 +75,9 @@ CUDA_VISIBLE_DEVICES=0 vllm serve \
 --served-model-name Qwen3vl \
 --trust-remote-code \
 --max-model-len 20480 \
---port 8010
+--port 8010 \
+--enable-auto-tool-choice \
+--tool-call-parser hermes
 ```
 ### 请求示例
 ```shell
